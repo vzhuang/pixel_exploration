@@ -1,0 +1,486 @@
+INFO:gym.wrappers.monitoring:Finished writing results. You can upload them to the scoreboard via gym.upload('/home/vincent/Documents/pixel_exploration/tmp/gym-results')
+INFO:root:Timestep 55000
+INFO:root:mean reward (100 episodes) -20.172414
+INFO:root:best mean reward -inf
+INFO:root:episodes 58
+INFO:root:exploration 0.950500
+INFO:root:Timestep 60000
+INFO:root:mean reward (100 episodes) -20.218750
+INFO:root:best mean reward -inf
+INFO:root:episodes 64
+INFO:root:exploration 0.946000
+INFO:root:Timestep 65000
+INFO:root:mean reward (100 episodes) -20.231884
+INFO:root:best mean reward -inf
+INFO:root:episodes 69
+INFO:root:exploration 0.941500
+INFO:root:Timestep 70000
+INFO:root:mean reward (100 episodes) -20.280000
+INFO:root:best mean reward -inf
+INFO:root:episodes 75
+INFO:root:exploration 0.937000
+INFO:root:Timestep 75000
+INFO:root:mean reward (100 episodes) -20.225000
+INFO:root:best mean reward -inf
+INFO:root:episodes 80
+INFO:root:exploration 0.932500
+INFO:root:Timestep 80000
+INFO:root:mean reward (100 episodes) -20.232558
+INFO:root:best mean reward -inf
+INFO:root:episodes 86
+INFO:root:exploration 0.928000
+INFO:root:Timestep 85000
+INFO:root:mean reward (100 episodes) -20.241758
+INFO:root:best mean reward -inf
+INFO:root:episodes 91
+INFO:root:exploration 0.923500
+INFO:root:Timestep 90000
+INFO:root:mean reward (100 episodes) -20.257732
+INFO:root:best mean reward -inf
+INFO:root:episodes 97
+INFO:root:exploration 0.919000
+INFO:root:Timestep 95000
+INFO:root:mean reward (100 episodes) -20.280000
+INFO:root:best mean reward -20.280000
+INFO:root:episodes 102
+INFO:root:exploration 0.914500
+INFO:root:Timestep 100000
+INFO:root:mean reward (100 episodes) -20.300000
+INFO:root:best mean reward -20.280000
+INFO:root:episodes 108
+INFO:root:exploration 0.910000
+INFO:root:Timestep 105000
+INFO:root:mean reward (100 episodes) -20.250000
+INFO:root:best mean reward -20.250000
+INFO:root:episodes 113
+INFO:root:exploration 0.905500
+INFO:root:Timestep 110000
+INFO:root:mean reward (100 episodes) -20.290000
+INFO:root:best mean reward -20.250000
+INFO:root:episodes 119
+INFO:root:exploration 0.901000
+INFO:root:Timestep 115000
+INFO:root:mean reward (100 episodes) -20.280000
+INFO:root:best mean reward -20.250000
+INFO:root:episodes 124
+INFO:root:exploration 0.896500
+INFO:root:Timestep 120000
+INFO:root:mean reward (100 episodes) -20.230000
+INFO:root:best mean reward -20.230000
+INFO:root:episodes 129
+INFO:root:exploration 0.892000
+INFO:root:Timestep 125000
+INFO:root:mean reward (100 episodes) -20.190000
+INFO:root:best mean reward -20.190000
+INFO:root:episodes 135
+INFO:root:exploration 0.887500
+INFO:root:Timestep 130000
+INFO:root:mean reward (100 episodes) -20.200000
+INFO:root:best mean reward -20.190000
+INFO:root:episodes 140
+INFO:root:exploration 0.883000
+INFO:root:Timestep 135000
+INFO:root:mean reward (100 episodes) -20.180000
+INFO:root:best mean reward -20.160000
+INFO:root:episodes 145
+INFO:root:exploration 0.878500
+INFO:root:Timestep 140000
+INFO:root:mean reward (100 episodes) -20.180000
+INFO:root:best mean reward -20.160000
+INFO:root:episodes 151
+INFO:root:exploration 0.874000
+INFO:root:Timestep 145000
+INFO:root:mean reward (100 episodes) -20.250000
+INFO:root:best mean reward -20.160000
+INFO:root:episodes 157
+INFO:root:exploration 0.869500
+INFO:root:Timestep 150000
+INFO:root:mean reward (100 episodes) -20.180000
+INFO:root:best mean reward -20.160000
+INFO:root:episodes 162
+INFO:root:exploration 0.865000
+INFO:root:Timestep 155000
+INFO:root:mean reward (100 episodes) -20.160000
+INFO:root:best mean reward -20.160000
+INFO:root:episodes 167
+INFO:root:exploration 0.860500
+INFO:root:Timestep 160000
+INFO:root:mean reward (100 episodes) -20.110000
+INFO:root:best mean reward -20.110000
+INFO:root:episodes 172
+INFO:root:exploration 0.856000
+INFO:root:Timestep 165000
+INFO:root:mean reward (100 episodes) -20.140000
+INFO:root:best mean reward -20.100000
+INFO:root:episodes 178
+INFO:root:exploration 0.851500
+INFO:root:Timestep 170000
+INFO:root:mean reward (100 episodes) -20.160000
+INFO:root:best mean reward -20.100000
+INFO:root:episodes 183
+INFO:root:exploration 0.847000
+INFO:root:Timestep 175000
+INFO:root:mean reward (100 episodes) -20.120000
+INFO:root:best mean reward -20.100000
+INFO:root:episodes 188
+INFO:root:exploration 0.842500
+INFO:root:Timestep 180000
+INFO:root:mean reward (100 episodes) -20.100000
+INFO:root:best mean reward -20.080000
+INFO:root:episodes 194
+INFO:root:exploration 0.838000
+INFO:root:Timestep 185000
+INFO:root:mean reward (100 episodes) -20.140000
+INFO:root:best mean reward -20.080000
+INFO:root:episodes 200
+INFO:root:exploration 0.833500
+INFO:root:Timestep 190000
+INFO:root:mean reward (100 episodes) -20.080000
+INFO:root:best mean reward -20.080000
+INFO:root:episodes 205
+INFO:root:exploration 0.829000
+INFO:root:Timestep 195000
+INFO:root:mean reward (100 episodes) -20.110000
+INFO:root:best mean reward -20.070000
+INFO:root:episodes 211
+INFO:root:exploration 0.824500
+INFO:root:Timestep 200000
+INFO:root:mean reward (100 episodes) -20.090000
+INFO:root:best mean reward -20.070000
+INFO:root:episodes 216
+INFO:root:exploration 0.820000
+INFO:root:Timestep 205000
+INFO:root:mean reward (100 episodes) -20.080000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 221
+INFO:root:exploration 0.815500
+INFO:root:Timestep 210000
+INFO:root:mean reward (100 episodes) -20.100000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 227
+INFO:root:exploration 0.811000
+INFO:root:Timestep 215000
+INFO:root:mean reward (100 episodes) -20.140000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 232
+INFO:root:exploration 0.806500
+INFO:root:Timestep 220000
+INFO:root:mean reward (100 episodes) -20.150000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 238
+INFO:root:exploration 0.802000
+INFO:root:Timestep 225000
+INFO:root:mean reward (100 episodes) -20.190000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 243
+INFO:root:exploration 0.797500
+INFO:root:Timestep 230000
+INFO:root:mean reward (100 episodes) -20.150000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 248
+INFO:root:exploration 0.793000
+INFO:root:Timestep 235000
+INFO:root:mean reward (100 episodes) -20.160000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 254
+INFO:root:exploration 0.788500
+INFO:root:Timestep 240000
+INFO:root:mean reward (100 episodes) -20.160000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 259
+INFO:root:exploration 0.784000
+INFO:root:Timestep 245000
+INFO:root:mean reward (100 episodes) -20.210000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 265
+INFO:root:exploration 0.779500
+INFO:root:Timestep 250000
+INFO:root:mean reward (100 episodes) -20.220000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 270
+INFO:root:exploration 0.775000
+INFO:root:Timestep 255000
+INFO:root:mean reward (100 episodes) -20.210000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 275
+INFO:root:exploration 0.770500
+INFO:root:Timestep 260000
+INFO:root:mean reward (100 episodes) -20.210000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 281
+INFO:root:exploration 0.766000
+INFO:root:Timestep 265000
+INFO:root:mean reward (100 episodes) -20.210000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 286
+INFO:root:exploration 0.761500
+INFO:root:Timestep 270000
+INFO:root:mean reward (100 episodes) -20.240000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 291
+INFO:root:exploration 0.757000
+INFO:root:Timestep 275000
+INFO:root:mean reward (100 episodes) -20.220000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 297
+INFO:root:exploration 0.752500
+INFO:root:Timestep 280000
+INFO:root:mean reward (100 episodes) -20.260000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 302
+INFO:root:exploration 0.748000
+INFO:root:Timestep 285000
+INFO:root:mean reward (100 episodes) -20.280000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 308
+INFO:root:exploration 0.743500
+INFO:root:Timestep 290000
+INFO:root:mean reward (100 episodes) -20.290000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 313
+INFO:root:exploration 0.739000
+INFO:root:Timestep 295000
+INFO:root:mean reward (100 episodes) -20.270000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 318
+INFO:root:exploration 0.734500
+INFO:root:Timestep 300000
+INFO:root:mean reward (100 episodes) -20.280000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 324
+INFO:root:exploration 0.730000
+INFO:root:Timestep 305000
+INFO:root:mean reward (100 episodes) -20.280000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 330
+INFO:root:exploration 0.725500
+INFO:root:Timestep 310000
+INFO:root:mean reward (100 episodes) -20.300000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 335
+INFO:root:exploration 0.721000
+INFO:root:Timestep 315000
+INFO:root:mean reward (100 episodes) -20.290000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 341
+INFO:root:exploration 0.716500
+INFO:root:Timestep 320000
+INFO:root:mean reward (100 episodes) -20.280000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 346
+INFO:root:exploration 0.712000
+INFO:root:Timestep 325000
+INFO:root:mean reward (100 episodes) -20.240000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 351
+INFO:root:exploration 0.707500
+INFO:root:Timestep 330000
+INFO:root:mean reward (100 episodes) -20.240000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 357
+INFO:root:exploration 0.703000
+INFO:root:Timestep 335000
+INFO:root:mean reward (100 episodes) -20.270000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 362
+INFO:root:exploration 0.698500
+INFO:root:Timestep 340000
+INFO:root:mean reward (100 episodes) -20.290000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 368
+INFO:root:exploration 0.694000
+INFO:root:Timestep 345000
+INFO:root:mean reward (100 episodes) -20.310000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 374
+INFO:root:exploration 0.689500
+INFO:root:Timestep 350000
+INFO:root:mean reward (100 episodes) -20.330000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 379
+INFO:root:exploration 0.685000
+INFO:root:Timestep 355000
+INFO:root:mean reward (100 episodes) -20.310000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 384
+INFO:root:exploration 0.680500
+INFO:root:Timestep 360000
+INFO:root:mean reward (100 episodes) -20.320000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 390
+INFO:root:exploration 0.676000
+INFO:root:Timestep 365000
+INFO:root:mean reward (100 episodes) -20.310000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 395
+INFO:root:exploration 0.671500
+INFO:root:Timestep 370000
+INFO:root:mean reward (100 episodes) -20.310000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 401
+INFO:root:exploration 0.667000
+INFO:root:Timestep 375000
+INFO:root:mean reward (100 episodes) -20.320000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 407
+INFO:root:exploration 0.662500
+INFO:root:Timestep 380000
+INFO:root:mean reward (100 episodes) -20.310000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 412
+INFO:root:exploration 0.658000
+INFO:root:Timestep 385000
+INFO:root:mean reward (100 episodes) -20.290000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 417
+INFO:root:exploration 0.653500
+INFO:root:Timestep 390000
+INFO:root:mean reward (100 episodes) -20.280000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 422
+INFO:root:exploration 0.649000
+INFO:root:Timestep 395000
+INFO:root:mean reward (100 episodes) -20.290000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 428
+INFO:root:exploration 0.644500
+INFO:root:Timestep 400000
+INFO:root:mean reward (100 episodes) -20.270000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 433
+INFO:root:exploration 0.640000
+INFO:root:Timestep 405000
+INFO:root:mean reward (100 episodes) -20.290000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 438
+INFO:root:exploration 0.635500
+INFO:root:Timestep 410000
+INFO:root:mean reward (100 episodes) -20.280000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 444
+INFO:root:exploration 0.631000
+INFO:root:Timestep 415000
+INFO:root:mean reward (100 episodes) -20.280000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 449
+INFO:root:exploration 0.626500
+INFO:root:Timestep 420000
+INFO:root:mean reward (100 episodes) -20.290000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 454
+INFO:root:exploration 0.622000
+INFO:root:Timestep 425000
+INFO:root:mean reward (100 episodes) -20.280000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 459
+INFO:root:exploration 0.617500
+INFO:root:Timestep 430000
+INFO:root:mean reward (100 episodes) -20.250000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 464
+INFO:root:exploration 0.613000
+INFO:root:Timestep 435000
+INFO:root:mean reward (100 episodes) -20.210000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 469
+INFO:root:exploration 0.608500
+INFO:root:Timestep 440000
+INFO:root:mean reward (100 episodes) -20.200000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 474
+INFO:root:exploration 0.604000
+INFO:root:Timestep 445000
+INFO:root:mean reward (100 episodes) -20.220000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 480
+INFO:root:exploration 0.599500
+INFO:root:Timestep 450000
+INFO:root:mean reward (100 episodes) -20.210000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 485
+INFO:root:exploration 0.595000
+INFO:root:Timestep 455000
+INFO:root:mean reward (100 episodes) -20.210000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 491
+INFO:root:exploration 0.590500
+INFO:root:Timestep 460000
+INFO:root:mean reward (100 episodes) -20.210000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 496
+INFO:root:exploration 0.586000
+INFO:root:Timestep 465000
+INFO:root:mean reward (100 episodes) -20.200000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 501
+INFO:root:exploration 0.581500
+INFO:root:Timestep 470000
+INFO:root:mean reward (100 episodes) -20.160000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 506
+INFO:root:exploration 0.577000
+INFO:root:Timestep 475000
+INFO:root:mean reward (100 episodes) -20.130000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 511
+INFO:root:exploration 0.572500
+INFO:root:Timestep 480000
+INFO:root:mean reward (100 episodes) -20.160000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 517
+INFO:root:exploration 0.568000
+INFO:root:Timestep 485000
+INFO:root:mean reward (100 episodes) -20.140000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 521
+INFO:root:exploration 0.563500
+INFO:root:Timestep 490000
+INFO:root:mean reward (100 episodes) -20.160000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 527
+INFO:root:exploration 0.559000
+INFO:root:Timestep 495000
+INFO:root:mean reward (100 episodes) -20.120000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 532
+INFO:root:exploration 0.554500
+INFO:root:Timestep 500000
+INFO:root:mean reward (100 episodes) -20.090000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 537
+INFO:root:exploration 0.550000
+INFO:root:Timestep 505000
+INFO:root:mean reward (100 episodes) -20.130000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 542
+INFO:root:exploration 0.545500
+INFO:root:Timestep 510000
+INFO:root:mean reward (100 episodes) -20.110000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 547
+INFO:root:exploration 0.541000
+INFO:root:Timestep 515000
+INFO:root:mean reward (100 episodes) -20.120000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 552
+INFO:root:exploration 0.536500
+INFO:root:Timestep 520000
+INFO:root:mean reward (100 episodes) -20.120000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 556
+INFO:root:exploration 0.532000
+INFO:root:Timestep 525000
+INFO:root:mean reward (100 episodes) -20.100000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 561
+INFO:root:exploration 0.527500
+INFO:root:Timestep 530000
+INFO:root:mean reward (100 episodes) -20.150000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 567
+INFO:root:exploration 0.523000
+INFO:root:Timestep 535000
+INFO:root:mean reward (100 episodes) -20.110000
+INFO:root:best mean reward -20.060000
+INFO:root:episodes 572
+INFO:root:exploration 0.518500
