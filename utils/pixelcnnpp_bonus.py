@@ -3,7 +3,7 @@ from math import pow, exp
 from pixel_cnn_pp.model import PixelCNN
 from pixel_cnn_pp.utils import *
 import logging
-
+from torch.autograd import Variable
 import torch
 import torch.optim as optim
 from torch.optim import lr_scheduler
@@ -26,8 +26,8 @@ class DotDict(object):
 
 # specify command line arguments using flags
 FLAGS = DotDict({
-    'img_height': 42,
-    'img_width': 42,
+    'img_height': 44,
+    'img_width': 44,
     'channel': 1,
     'data': 'mnist',
     'conditional': False,
@@ -48,9 +48,11 @@ FLAGS = DotDict({
     'summary_path': 'logs',
     'restore': True,
     'nr_resnet': 2,
-    'nr_filters': 16,
-    'nr_logistic_mix': 10,
-    'resnet_nonlinearity': 'concat_elu'
+    'nr_filters': 12,
+    'nr_logistic_mix': 5,
+    'resnet_nonlinearity': 'concat_elu',
+    'lr_decay': 0.999995,
+    'lr': 0.0001
 })
 
 class PixelBonus(object):
@@ -59,10 +61,10 @@ class PixelBonus(object):
     """
     def __init__(self, FLAGS):
         # init model
-        self.X = tf.placeholder(
-            tf.float32,
-            shape=[None, FLAGS.img_height, FLAGS.img_width, FLAGS.channel])
-        self.model = PixelCNN(self.X, nr_resnet=FLAGS.nr_resnet, nr_filters=FLAGS.nr_filters,
+        # self.X = tf.placeholder(
+        #     tf.float32,
+        #     shape=[None, FLAGS.img_height, FLAGS.img_width, FLAGS.channel])
+        self.model = PixelCNN(nr_resnet=FLAGS.nr_resnet, nr_filters=FLAGS.nr_filters,
                               nr_logistic_mix=FLAGS.nr_logistic_mix,
                               resnet_nonlinearity=FLAGS.resnet_nonlinearity,
                               input_channels=FLAGS.channel)
@@ -70,8 +72,8 @@ class PixelBonus(object):
         self.flags = FLAGS
         
         # init optimizer
-        self.optimizer = optim.Adam(self.model.parameters(), lr=args.lr)
-        self.scheduler = lr_scheduler.StepLR(optimizer, step_size=1, gamma=args.lr_decay)
+        self.optimizer = optim.Adam(self.model.parameters(), lr=FLAGS.lr)
+        self.scheduler = lr_scheduler.StepLR(self.optimizer, step_size=1, gamma=FLAGS.lr_decay)
 
         # loss op
         self.loss_op = lambda real, fake : discretized_mix_logistic_loss_1d(real, fake)
@@ -97,8 +99,15 @@ class PixelBonus(object):
         frame = cv2.resize(obs, self.frame_shape)
 
         # [0,1] pixel values
-        frame = (np.reshape(frame, [42, 42, 1]) / 255.)
-        frame = np.expand_dims(frame, 0)  # (N, Y, X, C)
+        frame = (np.reshape(frame, [1, FLAGS.img_height, FLAGS.img_width]) / 255.)
+        frame = np.expand_dims(frame, 0)  # (N, Y, X, C
+        # frame = np.array(frame)
+        # print(frame)
+        # print(frame.shape)
+        frame = torch.from_numpy(frame)
+        frame = frame.type(torch.FloatTensor)
+        frame = frame.cuda()
+        frame = Variable(frame)
 
         # compute PG
         # log_prob = self.model(frame)
@@ -111,11 +120,15 @@ class PixelBonus(object):
         # compute prediction gain
         pred_gain = max(0, log_recoding_prob - log_prob)
 
+        # print('pred_gain', pred_gain)
+
         # save log loss
         # nll = self.sess.run(self.model.nll, feed_dict={self.X: frame})
 
         # calculate intrinsic reward
         intrinsic_reward = pow((exp(0.1*pow(t + 1, -0.5) * pred_gain) - 1), 0.5)
+
+        # print('intrinsic_reward', intrinsic_reward)
 
         return intrinsic_reward
 
@@ -144,7 +157,9 @@ class PixelBonus(object):
             # logprob, target_idx = self.sess.run([
             #     self.model.log_probs, self.model.target_idx], feed_dict={self.X: img})
 
-        print(logprob)
+        # print(logprob)
+        # print(logprob.data[0])
+        return logprob.data[0]
         pred_prob = logprob[np.arange(FLAGS.img_height * FLAGS.img_width),
                             target_idx].sum()
 

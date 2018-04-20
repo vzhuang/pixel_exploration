@@ -5,12 +5,13 @@ Config file for DQN on Atari 2600 suite
 
 class Config():
     # output config
-    output_path = "results/dqn_pong/"
+    output_path = "results/dqn_montezuma/"
     # output_path = "/Users/kristyc/Downloads/"
     model_output = output_path + "model.weights/"
-    log_path = output_path + "test_dqn.txt"
+    log_path = output_path + "test_montezuma.txt"
 
     # environment
+    #env_name = "MontezumaRevengeNoFrameskip-v4"
     env_name = "PongNoFrameskip-v4"
     deep = True
     clip_grad = True
@@ -40,4 +41,4 @@ class Config():
     # epsilon-greedy
     egreedy_exploration = True
     mmc = False
-    bonus = False
+    bonus = True
