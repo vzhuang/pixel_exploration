@@ -5,10 +5,10 @@ Config file for DQN on Atari 2600 suite
 
 class Config():
     # output config
-    output_path = "results/dqn_montezuma/"
+    output_path = "results/dqn_pong/"
     # output_path = "/Users/kristyc/Downloads/"
     model_output = output_path + "model.weights/"
-    log_path = output_path + "test_montezuma.txt"
+    log_path = output_path + "test_pong.txt"
 
     # environment
     #env_name = "MontezumaRevengeNoFrameskip-v4"
@@ -17,7 +17,7 @@ class Config():
     clip_grad = True
 
     # model and train config
-    log_freq = 5000
+    log_freq = 1000
     # save_freq = 5000
 
     # hyperparams

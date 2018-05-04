@@ -1,6 +1,7 @@
 """
 Driver file for running DQN agent on Atari
 """
+import cProfile
 import os
 import gym
 import numpy as np
@@ -15,6 +16,7 @@ from utils.schedule import LinearSchedule
 from configs.dqn_config import Config
 from learn import OptimizerSpec, dqn_learn
 from utils.pixelcnnpp_bonus import PixelBonus
+#from utils.tf_pixelcnnpp_wrapper import PixelBonus
 
 # do logging
 # logger = logging.getLogger(__name__)
@@ -73,6 +75,7 @@ def main(config, env):
     :return:
     """
     FLAGS = update_tf_wrapper_args(args, utils.pixelcnnpp_bonus.FLAGS)
+    #FLAGS = update_tf_wrapper_args(args, utils.tf_pixelcnnpp_wrapper.FLAGS)
 
     def stopping_criterion(env, t):
         # t := number of steps of wrapped env
@@ -129,5 +132,5 @@ if __name__ == '__main__':
 
     # print all argument variables
     # print_key_pairs(args.__dict__.items(), title='Command line args')
-
     main(config_file, env)
+    #cProfile.run('main(config_file, env)')

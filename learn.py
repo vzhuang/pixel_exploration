@@ -16,6 +16,7 @@ from utils.gym_atari_wrappers import get_wrapper_by_name
 from torch.autograd import Variable
 import pickle
 import logging
+import time
 
 
 OptimizerSpec = namedtuple("OptimizerSpec", ["constructor", "kwargs"])
@@ -105,6 +106,7 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
     mean_episode_reward = -float('nan')
     best_mean_episode_reward = -float('inf')
     last_obs = env.reset()
+    prev = time.time()
 
     # index trackers for updating mc returns
     episode_indices_in_buffer = []
@@ -150,7 +152,11 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
             intrinsic_reward = pixel_bonus.bonus(obs, t)
             if t % config.log_freq == 0:
                 logging.info('t: {}\t intrinsic reward: {}'.format(t, intrinsic_reward))
-
+                curr = time.time()
+                diff = curr - prev
+                prev = curr
+                logging.info("Timestep %d" % (t,))
+                logging.info("Time elapsed %f" % diff)
             # add intrinsic reward to clipped reward
             reward += intrinsic_reward
             # clip reward to be in [-1, +1] once again
@@ -268,7 +274,11 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
             Statistic["episode_rewards"].append(episode_rewards)
 
             if t % config.log_freq == 0 and t > config.learning_starts:
-                logging.info("Timestep %d" % (t,))
+                # curr = time.time()
+                # diff = curr - prev
+                # prev = curr
+                # logging.info("Timestep %d" % (t,))
+                # logging.info("Time elapsed %f" % diff)
                 logging.info("mean reward (100 episodes) %f" % mean_episode_reward)
                 logging.info("best mean reward %f" % best_mean_episode_reward)
                 logging.info("episodes %d" % len(episode_rewards))

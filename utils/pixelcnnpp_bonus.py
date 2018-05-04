@@ -26,8 +26,8 @@ class DotDict(object):
 
 # specify command line arguments using flags
 FLAGS = DotDict({
-    'img_height': 44,
-    'img_width': 44,
+    'img_height': 42,
+    'img_width': 42,
     'channel': 1,
     'data': 'mnist',
     'conditional': False,
@@ -47,12 +47,13 @@ FLAGS = DotDict({
     'samples_path': 'samples',
     'summary_path': 'logs',
     'restore': True,
-    'nr_resnet': 2,
-    'nr_filters': 12,
-    'nr_logistic_mix': 5,
+    'nr_resnet': 1,
+    'nr_filters': 8,
+    'nr_logistic_mix': 4,
     'resnet_nonlinearity': 'concat_elu',
     'lr_decay': 0.999995,
-    'lr': 0.0001
+    'lr': 0.0001,
+    'num_ds': 1,
 })
 
 class PixelBonus(object):
@@ -67,7 +68,7 @@ class PixelBonus(object):
         self.model = PixelCNN(nr_resnet=FLAGS.nr_resnet, nr_filters=FLAGS.nr_filters,
                               nr_logistic_mix=FLAGS.nr_logistic_mix,
                               resnet_nonlinearity=FLAGS.resnet_nonlinearity,
-                              input_channels=FLAGS.channel)
+                              input_channels=FLAGS.channel, num_ds=FLAGS.num_ds)
         self.model = self.model.cuda()
         self.flags = FLAGS
         
@@ -140,27 +141,31 @@ class PixelBonus(object):
         """
         if update:
             self.model.train(True)
-            torch.cuda.synchronize() # TODO: is this necessary??
+            # torch.cuda.synchronize() # TODO: is this necessary??
             output = self.model(img)
             loss = self.loss_op(img, output)
+            self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
-            logprob = loss
+            self.scheduler.step()
+            # logprob = loss
             # _, logprob, target_idx = self.sess.run([
             #     self.optimizer, self.model.log_probs, self.model.target_idx], feed_dict={
             #     self.X: img})
         else:
             self.model.train(False)
+            self.model.eval()
             output = self.model(img)
             loss = self.loss_op(img, output)
-            logprob = loss
+            # logprob = loss
             # logprob, target_idx = self.sess.run([
             #     self.model.log_probs, self.model.target_idx], feed_dict={self.X: img})
 
         # print(logprob)
-        # print(logprob.data[0])
-        return logprob.data[0]
-        pred_prob = logprob[np.arange(FLAGS.img_height * FLAGS.img_width),
-                            target_idx].sum()
+        # print loss.data[0]
+        return loss.data[0]
+        # return logprob.data[0]
+        # pred_prob = logprob[np.arange(FLAGS.img_height * FLAGS.img_width),
+        #                     target_idx].sum()
 
-        return pred_prob
+        # return pred_prob
