@@ -1,0 +1,3 @@
+[submodule "pixel_cnn_pp"]
+	path = pixel_cnn_pp
+	url = https://github.com/vzhuang/pixel_cnn_pp
