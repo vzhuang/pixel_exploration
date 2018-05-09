@@ -48,8 +48,8 @@ FLAGS = DotDict({
     'summary_path': 'logs',
     'restore': True,
     'nr_resnet': 1,
-    'nr_filters': 8,
-    'nr_logistic_mix': 4,
+    'nr_filters': 16,
+    'nr_logistic_mix': 5,
     'resnet_nonlinearity': 'concat_elu',
     'lr_decay': 0.999995,
     'lr': 0.0001,
@@ -71,6 +71,7 @@ class PixelBonus(object):
                               input_channels=FLAGS.channel, num_ds=FLAGS.num_ds)
         self.model = self.model.cuda()
         self.flags = FLAGS
+        self.writer = SummaryWriter()
         
         # init optimizer
         self.optimizer = optim.Adam(self.model.parameters(), lr=FLAGS.lr)
@@ -112,14 +113,16 @@ class PixelBonus(object):
 
         # compute PG
         # log_prob = self.model(frame)
-        log_prob = self.density_model_logprobs(frame, update=True)
+        log_prob = self.density_model_logprobs(frame, t, update=True)
 
         # train a single additional step with the same observation; no update
         # log_recoding_prob = self.model(frame, update=False)
-        log_recoding_prob = self.density_model_logprobs(frame, update=False)
+        log_recoding_prob = self.density_model_logprobs(frame, t, update=False)
 
         # compute prediction gain
         pred_gain = max(0, log_recoding_prob - log_prob)
+        # print('PG', (log_recoding_prob - log_prob).data[0])
+        self.writer.add_scalar('data/PG', log_recoding_prob - log_prob, t)
 
         # print('pred_gain', pred_gain)
 
@@ -133,7 +136,7 @@ class PixelBonus(object):
 
         return intrinsic_reward
 
-    def density_model_logprobs(self, img, update=False):
+    def density_model_logprobs(self, img, t, update=False):
         """
         compute log loss WITHOUT updating parameters
         :param img:
@@ -148,6 +151,8 @@ class PixelBonus(object):
             loss.backward()
             self.optimizer.step()
             self.scheduler.step()
+            print 'loss', loss.data[0]
+            self.writer.add_scalar('data/loss', loss, t)
             # logprob = loss
             # _, logprob, target_idx = self.sess.run([
             #     self.optimizer, self.model.log_probs, self.model.target_idx], feed_dict={
