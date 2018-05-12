@@ -52,7 +52,7 @@ FLAGS = DotDict({
     'nr_logistic_mix': 5,
     'resnet_nonlinearity': 'concat_elu',
     'lr_decay': 0.999995,
-    'lr': 0.0001,
+    'lr': 0.00002,
     'num_ds': 1,
 })
 
@@ -143,7 +143,8 @@ class PixelBonus(object):
         :return:
         """
         if update:
-            self.model.train(True)
+            #self.model.train(True)
+            self.model.eval()
             # torch.cuda.synchronize() # TODO: is this necessary??
             output = self.model(img)
             loss = self.loss_op(img, output)
@@ -151,14 +152,14 @@ class PixelBonus(object):
             loss.backward()
             self.optimizer.step()
             self.scheduler.step()
-            print 'loss', loss.data[0]
+            # print 'loss', loss.data[0]
             self.writer.add_scalar('data/loss', loss, t)
             # logprob = loss
             # _, logprob, target_idx = self.sess.run([
             #     self.optimizer, self.model.log_probs, self.model.target_idx], feed_dict={
             #     self.X: img})
         else:
-            self.model.train(False)
+            #self.model.train(True)
             self.model.eval()
             output = self.model(img)
             loss = self.loss_op(img, output)

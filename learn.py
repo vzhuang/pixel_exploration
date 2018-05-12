@@ -157,7 +157,9 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
                 prev = curr
                 logging.info("Timestep %d" % (t,))
                 logging.info("Time elapsed %f" % diff)
-            # add intrinsic reward to clipped reward
+            pixel_bonus.writer.add_scalar('data/reward', reward, t)
+            pixel_bonus.writer.add_scalar('data/bonus', intrinsic_reward, t)
+            # add intrinsic reward to clipped reward            
             reward += intrinsic_reward
             # clip reward to be in [-1, +1] once again
             reward = max(-1.0, min(reward, 1.0))
