@@ -27,7 +27,6 @@ Statistic = {
     "episode_rewards": []
 }
 
-
 # use GPU if available
 USE_CUDA = torch.cuda.is_available()
 FloatTensor = torch.cuda.FloatTensor if USE_CUDA else torch.FloatTensor
@@ -61,6 +60,10 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
     Q = q_func(in_channel, num_actions)
     target_Q = deepcopy(Q)
 
+    # define C network and target C
+    C = q_func(in_channel, num_actions)
+    target_C = deepcopy(Q)
+
     # call tensorflow wrapper to get density model
     if config.bonus:
         pixel_bonus = density(FLAGS=cnn_kwargs)
@@ -68,31 +71,42 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
     if USE_CUDA:
         Q.cuda()
         target_Q.cuda()
+        C.cuda()
+        target_C.cuda()
 
     # define eps-greedy exploration strategy
-    def select_action(model, obs, t):
+    def select_action(model, bonus_model, obs, t):
         """
         Selects random action w prob eps; otherwise returns best action
         :param exploration:
         :param t:
         :return:
         """
+        def get_best_action():
+            obs = torch.from_numpy(obs).type(FloatTensor).unsqueeze(0) / 255.0
+            Q_val = model(Variable(obs, volatile=True))
+            C_val = bonus_model(Variable(obs, volatile=True))
+            b = C_val
+            if config.gaussian_ts:
+                b = config.alpha * torch.distributions.normal.Normal(0, C_val)
+            return (Q_val + b).data.max(1)[1].view(1, 1)
         if config.egreedy_exploration:
             sample = random.random()
             eps_threshold = exploration.value(t)
-            if sample > eps_threshold:
-                obs = torch.from_numpy(obs).type(FloatTensor).unsqueeze(0) / 255.0
-                return model(Variable(obs, volatile=True)).data.max(1)[1].view(1, 1)
+            if sample > eps_threshold:                   
+                return get_best_action()
             else:
                 # return random action
                 return LongTensor([[random.randrange(num_actions)]])
         # no exploration; just take best action
         else:
-            obs = torch.from_numpy(obs).type(FloatTensor).unsqueeze(0) / 255.0
-            return model(Variable(obs, volatile=True)).data.max(1)[1].view(1, 1)
+            return get_best_action()
     # construct torch optimizer
     optimizer = optimizer_spec.constructor(Q.parameters(), **optimizer_spec.kwargs)
 
+    # C optimizer
+    C_optimizer = optimizer_spec.constructor(C.parameters(), **optimizer_spec.kwargs)
+    
     # construct the replay buffer
     if config.mmc:
         replay_buffer = MMCReplayBuffer(config.replay_buffer_size, config.frame_history_len)
@@ -137,7 +151,7 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
 
         # choose random action if not yet started learning
         if t > config.learning_starts:
-            action = select_action(Q, recent_obs, t)[0][0]
+            action = select_action(Q, C, recent_obs, t)[0][0]
         else:
             action = random.randrange(num_actions)
 
@@ -148,8 +162,8 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
 
         ###############################################
         # do density model stuff here
-        if config.bonus:
-            intrinsic_reward = pixel_bonus.bonus(obs, t)
+        if config.bonus: # just assume this is true
+            intrinsic_reward = pixel_bonus.bonus(obs, action, t)
             if t % config.log_freq == 0:
                 logging.info('t: {}\t intrinsic reward: {}'.format(t, intrinsic_reward))
                 curr = time.time()
@@ -157,8 +171,163 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
                 prev = curr
                 logging.info("Timestep %d" % (t,))
                 logging.info("Time elapsed %f" % diff)
-            pixel_bonus.writer.add_scalar('data/reward', reward, t)
+            bonus = intrinsic_reward
+            # TODO: add bonus/intrinsic_reward to replay buffer
+            pixel_bonus.writer.add_scalar('data/bonus', bonus, t)
+            # add intrinsic reward to clipped reward
+            # NOTE: don't add bonus since we separate Q and C
+            # reward += intrinsic_reward
+            # clip reward to be in [-1, +1] once again
+            reward = max(-1.0, min(reward, 1.0))
+            assert -1.0 <= reward <= 1.0
+        ################################################
+
+        # store reward in list to use for calculating MMC update
+        reward_each_timestep.append(reward)
+        replay_buffer.store_effect(last_idx, action, reward, done, bonus)
+
+        # reset environment when reaching episode boundary
+        if done:
+            # only if computing MC return
+            if config.mmc:
+                # episode has terminated --> need to do MMC update here
+                # loop through all transitions of this past episode and add in mc_returns
+                assert len(timesteps_in_buffer) == len(reward_each_timestep)
+                mc_returns = np.zeros(len(timesteps_in_buffer))
+
+                # compute mc returns
+                r = 0
+                for i in reversed(range(len(mc_returns))):
+                    r = reward_each_timestep[i] + config.gamma * r
+                    mc_returns[i] = r
+
+                # populate replay buffer
+                for j in range(len(mc_returns)):
+                    # get transition tuple in reward buffer and update
+                    update_idx = episode_indices_in_buffer[j]
+                    # put mmc return back into replay buffer
+                    replay_buffer.mc_return_t[update_idx] = mc_returns[j]
+            # reset because end of episode
+            episode_indices_in_buffer = []
+            timesteps_in_buffer = []
+            cur_timestep = 0
+            reward_each_timestep = []
+
+            # reset
+            obs = env.reset()
+        last_obs = obs
+
+        ### 3. Perform experience replay and train the network.
+        # note that this is only done if the replay buffer contains enough samples
+        # for us to learn something useful -- until then, the model will not be
+        # initialized and random actions should be taken
+
+        # perform training
+        if (t > config.learning_starts and t % config.learning_freq == 0 and
+                replay_buffer.can_sample(config.batch_size)):
+
+            # sample batch of transitions
+            if config.mmc:
+                # also grab MMC batch if computing MMC return
+                obs_batch, act_batch, rew_batch, next_obs_batch, bonus_batch, done_mask, mc_batch = \
+                replay_buffer.sample(config.batch_size)
+                mc_batch = Variable(torch.from_numpy(mc_batch).type(FloatTensor))
+            else:
+                obs_batch, act_batch, rew_batch, next_obs_batch, bonus_batch, done_mask = \
+                replay_buffer.sample(config.batch_size)
+
+            # convert variables to torch tensor variables
+            obs_batch = Variable(torch.from_numpy(obs_batch).type(FloatTensor)/255.0)
+            act_batch = Variable(torch.from_numpy(act_batch).type(LongTensor))
+            rew_batch = Variable(torch.from_numpy(rew_batch).type(FloatTensor))
+            next_obs_batch = Variable(torch.from_numpy(next_obs_batch).type(FloatTensor)/255.0)
+            bonus_batch = Variable(torch.from_numpy(bonus_batch).type(FloatTensor))
+            not_done_mask = Variable(torch.from_numpy(1 - done_mask).type(FloatTensor))
+
+            # 3.c: train the model: perform gradient step and update the network
+            current_Q_values = Q(obs_batch).gather(1, act_batch.unsqueeze(1)).squeeze()
+            # this gives you a FloatTensor of size 32 // gives values of max
+            next_max_q = target_Q(next_obs_batch).detach().max(1)[0]
+
+            # torch.FloatTensor of size 32
+            next_Q_values = not_done_mask * next_max_q
+
+            # this is [r(x,a) + gamma * max_a' Q(x', a')]
+            target_Q_values = rew_batch + (config.gamma * next_Q_values)
+
+            if config.mmc:
+                # replace target_Q_values with mixed target
+                target_Q_values = ((1-config.beta) * target_Q_values) + (config.beta *
+                                                                         mc_batch)
+            # use huber loss
+            loss = F.smooth_l1_loss(current_Q_values, target_Q_values)
+
+            # zero out gradient
+            optimizer.zero_grad()
+
+            # backward pass
+            loss.backward()
+
+            # gradient clipping
+            for params in Q.parameters():
+                params.grad.data.clamp_(-1, 1)
+
+            # perform param update
+            optimizer.step()
+            num_param_updates += 1
+
+            # periodically update the target network
+            if num_param_updates % config.target_update_freq == 0:
+                target_Q = deepcopy(Q)
+
+            ######### REPEAT ABOVE FOR C NETWORK ##################
+            
+            current_C_values = C(obs_batch).gather(1, act_batch.unsqueeze(1)).squeeze()
+            # this gives you a FloatTensor of size 32 // gives values of max
+            next_max_c = target_C(next_obs_batch).detach().max(1)[0]
+
+            # torch.FloatTensor of size 32
+            next_C_values = not_done_mask * next_max_c
+
+            # this is [r(x,a) + gamma * max_a' Q(x', a')]
+            target_C_values = rew_batch + (config.gamma * next_C_values)
+
+            if config.mmc:
+                # replace target_Q_values with mixed target
+                target_C_values = ((1-config.beta) * target_C_values) + (config.beta *
+                                                                         mc_batch)
+            # use huber loss
+            C_loss = F.smooth_l1_loss(current_C_values, target_C_values)
+
+            # zero out gradient
+            C_optimizer.zero_grad()
+
+            # backward pass
+            C_loss.backward()
+
+            # gradient clipping
+            for params in C.parameters():
+                params.grad.data.clamp_(-1, 1)
+
+            # perform param update
+            C_optimizer.step()
+            num_param_updates += 1
+
+            # periodically update the target network
+            if num_param_updates % config.target_update_freq == 0:
+                target_C = deepcopy(C)            
+
+            ### 4. Log progress
+            episode_rewards = get_wrapper_by_name(env, "Monitor").get_episode_rewards()
+            if len(episode_rewards) > 0:
+                mean_episode_reward = np.mean(episode_rewards[-100:])
+            if len(episode_rewards) > 100:
+                best_mean_episode_reward = max(best_mean_episode_reward, mean_episode_reward)
+                
+            # Tensorboard logging
             pixel_bonus.writer.add_scalar('data/bonus', intrinsic_reward, t)
+            pixel_bonus.writer.add_scalar('data/Q_loss', Q_loss, t)
+            pixel_bonus.writer.add_scalar('data/C_loss', C_loss, t)            
             # add intrinsic reward to clipped reward            
             reward += intrinsic_reward
             # clip reward to be in [-1, +1] once again
@@ -269,6 +438,9 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
                 mean_episode_reward = np.mean(episode_rewards[-100:])
             if len(episode_rewards) > 100:
                 best_mean_episode_reward = max(best_mean_episode_reward, mean_episode_reward)
+                
+            # tensorboard logging
+            pixel_bonus.writer.add_scalar('data/episode_reward', episode_rewards[-1], t)
 
             # save statistics
             Statistic["mean_episode_rewards"].append(mean_episode_reward)
@@ -284,8 +456,8 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
                 logging.info("mean reward (100 episodes) %f" % mean_episode_reward)
                 logging.info("best mean reward %f" % best_mean_episode_reward)
                 logging.info("episodes %d" % len(episode_rewards))
-                logging.info("exploration %f" % exploration.value(t))
-                sys.stdout.flush()
+                logging.info("exploration %f" % exploration.value(t))                
+                sys.stdout.flush()                
 
                 # Dump statistics to pickle
             # if t % 1000000 == 0 and t > config.learning_starts:

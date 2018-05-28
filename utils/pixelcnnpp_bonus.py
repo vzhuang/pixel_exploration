@@ -91,7 +91,7 @@ class PixelBonus(object):
         self.frame_shape = (FLAGS.img_height, FLAGS.img_width)
         # self.max_val = np.finfo(np.float32).max - 1e-10
 
-    def bonus(self, obs, t):
+    def bonus(self, obs, a, t):
         """
         Calculate exploration bonus with observed frame
         :param obs:
@@ -111,13 +111,18 @@ class PixelBonus(object):
         frame = frame.cuda()
         frame = Variable(frame)
 
+        action = np.zeros(1, num_actions)
+        action[0, a] = 1
+        action = torch.from_numpy(action)
+        action = action.cuda()
+
         # compute PG
         # log_prob = self.model(frame)
-        log_prob = self.density_model_logprobs(frame, t, update=True)
+        log_prob = self.density_model_logprobs(frame, a, t, update=True)
 
         # train a single additional step with the same observation; no update
         # log_recoding_prob = self.model(frame, update=False)
-        log_recoding_prob = self.density_model_logprobs(frame, t, update=False)
+        log_recoding_prob = self.density_model_logprobs(frame, a, t, update=False)
 
         # compute prediction gain
         pred_gain = max(0, log_recoding_prob - log_prob)
@@ -136,7 +141,7 @@ class PixelBonus(object):
 
         return intrinsic_reward
 
-    def density_model_logprobs(self, img, t, update=False):
+    def density_model_logprobs(self, img, a, t, update=False):
         """
         compute log loss WITHOUT updating parameters
         :param img:

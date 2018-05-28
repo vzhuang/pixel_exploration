@@ -40,5 +40,9 @@ class Config():
 
     # epsilon-greedy
     egreedy_exploration = True
-    mmc = False
+    mmc = True # False
+
+    # bonus 
     bonus = True
+    gaussian_ts = True
+    alpha = 1.
