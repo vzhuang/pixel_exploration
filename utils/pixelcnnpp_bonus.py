@@ -60,7 +60,7 @@ class PixelBonus(object):
     """
     Computes and updates PixelCNN++ bonus - taken from https://github.com/pclucas14/pixel-cnn-pp
     """
-    def __init__(self, FLAGS):
+    def __init__(self, FLAGS, num_actions):
         # init model
         # self.X = tf.placeholder(
         #     tf.float32,
@@ -68,7 +68,8 @@ class PixelBonus(object):
         self.model = PixelCNN(nr_resnet=FLAGS.nr_resnet, nr_filters=FLAGS.nr_filters,
                               nr_logistic_mix=FLAGS.nr_logistic_mix,
                               resnet_nonlinearity=FLAGS.resnet_nonlinearity,
-                              input_channels=FLAGS.channel, num_ds=FLAGS.num_ds)
+                              input_channels=FLAGS.channel, num_ds=FLAGS.num_ds,
+                              num_actions=num_actions)
         self.model = self.model.cuda()
         self.flags = FLAGS
         self.writer = SummaryWriter()
@@ -91,7 +92,7 @@ class PixelBonus(object):
         self.frame_shape = (FLAGS.img_height, FLAGS.img_width)
         # self.max_val = np.finfo(np.float32).max - 1e-10
 
-    def bonus(self, obs, a, t):
+    def bonus(self, obs, a, t, num_actions):
         """
         Calculate exploration bonus with observed frame
         :param obs:
@@ -111,18 +112,19 @@ class PixelBonus(object):
         frame = frame.cuda()
         frame = Variable(frame)
 
-        action = np.zeros(1, num_actions)
+        action = np.zeros((1, num_actions))
         action[0, a] = 1
         action = torch.from_numpy(action)
+        action = action.type(torch.FloatTensor)
         action = action.cuda()
 
         # compute PG
         # log_prob = self.model(frame)
-        log_prob = self.density_model_logprobs(frame, a, t, update=True)
+        log_prob = self.density_model_logprobs(frame, action, t, update=True)
 
         # train a single additional step with the same observation; no update
         # log_recoding_prob = self.model(frame, update=False)
-        log_recoding_prob = self.density_model_logprobs(frame, a, t, update=False)
+        log_recoding_prob = self.density_model_logprobs(frame, action, t, update=False)
 
         # compute prediction gain
         pred_gain = max(0, log_recoding_prob - log_prob)
@@ -151,7 +153,7 @@ class PixelBonus(object):
             #self.model.train(True)
             self.model.eval()
             # torch.cuda.synchronize() # TODO: is this necessary??
-            output = self.model(img)
+            output = self.model(img, a)
             loss = self.loss_op(img, output)
             self.optimizer.zero_grad()
             loss.backward()
@@ -166,7 +168,7 @@ class PixelBonus(object):
         else:
             #self.model.train(True)
             self.model.eval()
-            output = self.model(img)
+            output = self.model(img, a)
             loss = self.loss_op(img, output)
             # logprob = loss
             # logprob, target_idx = self.sess.run([

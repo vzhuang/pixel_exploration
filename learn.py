@@ -62,11 +62,11 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
 
     # define C network and target C
     C = q_func(in_channel, num_actions)
-    target_C = deepcopy(Q)
+    target_C = deepcopy(C)
 
     # call tensorflow wrapper to get density model
     if config.bonus:
-        pixel_bonus = density(FLAGS=cnn_kwargs)
+        pixel_bonus = density(cnn_kwargs, num_actions)
 
     if USE_CUDA:
         Q.cuda()
@@ -163,7 +163,7 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
         ###############################################
         # do density model stuff here
         if config.bonus: # just assume this is true
-            intrinsic_reward = pixel_bonus.bonus(obs, action, t)
+            intrinsic_reward = pixel_bonus.bonus(obs, action, t, num_actions)
             if t % config.log_freq == 0:
                 logging.info('t: {}\t intrinsic reward: {}'.format(t, intrinsic_reward))
                 curr = time.time()
@@ -192,6 +192,7 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
             if config.mmc:
                 # episode has terminated --> need to do MMC update here
                 # loop through all transitions of this past episode and add in mc_returns
+                print(len(timesteps_in_buffer), len(reward_each_timestep))
                 assert len(timesteps_in_buffer) == len(reward_each_timestep)
                 mc_returns = np.zeros(len(timesteps_in_buffer))
 
@@ -337,7 +338,7 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
 
         # store reward in list to use for calculating MMC update
         reward_each_timestep.append(reward)
-        replay_buffer.store_effect(last_idx, action, reward, done)
+        replay_buffer.store_effect(last_idx, action, reward, done, bonus)
 
         # reset environment when reaching episode boundary
         if done:

@@ -163,7 +163,7 @@ class ReplayBuffer(object):
             self.action   = np.empty([self.size],                     dtype=np.int32)
             self.reward   = np.empty([self.size],                     dtype=np.float32)
             self.done     = np.empty([self.size],                     dtype=np.bool)
-            self.bonus    = np.empty([self.size]                      dtype=np.float32)
+            self.bonus    = np.empty([self.size],                      dtype=np.float32)
         self.obs[self.next_idx] = frame
 
         # update state visitation table
@@ -211,7 +211,7 @@ class MMCReplayBuffer(ReplayBuffer):
     """
 
     def __init__(self, size, frame_history_len):
-        super().__init__(size, frame_history_len)
+        super(MMCReplayBuffer, self).__init__(size, frame_history_len)
         self.mc_return_t = None
 
     def _encode_sample(self, idxes):
