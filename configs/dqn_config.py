@@ -30,7 +30,7 @@ class Config():
 
     # others
     max_timesteps = 60000000
-    learning_starts = 50000
+    learning_starts = 15000
     beta = 0.2  # MMC
 
     # optimizer
@@ -40,9 +40,9 @@ class Config():
 
     # epsilon-greedy
     egreedy_exploration = True
-    mmc = True # False
+    mmc = False
 
     # bonus 
     bonus = True
-    gaussian_ts = True
+    gaussian_ts = False
     alpha = 1.
