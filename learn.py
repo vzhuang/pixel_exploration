@@ -10,6 +10,7 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 from copy import deepcopy
+from torchvision import utils
 from utils.updated_replay import ReplayBuffer, MMCReplayBuffer
 from utils.schedule import LinearSchedule
 from utils.gym_atari_wrappers import get_wrapper_by_name
@@ -17,6 +18,7 @@ from torch.autograd import Variable
 import pickle
 import logging
 import time
+import tensorflow as tf
 
 
 OptimizerSpec = namedtuple("OptimizerSpec", ["constructor", "kwargs"])
@@ -64,9 +66,14 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
     C = q_func(in_channel, num_actions)
     target_C = deepcopy(C)
 
+
     # call tensorflow wrapper to get density model
     if config.bonus:
-        pixel_bonus = density(cnn_kwargs, num_actions)
+        tf_config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
+        tf_config.gpu_options.allow_growth=True
+        sess = tf.Session(config=tf_config)
+        pixel_bonus = density(cnn_kwargs, sess, num_actions)
+        tf.initialize_all_variables().run(session=sess)
 
     if USE_CUDA:
         Q.cuda()
@@ -85,11 +92,13 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
         def get_best_action(obs):
             obs = torch.from_numpy(obs).type(FloatTensor).unsqueeze(0) / 255.0
             Q_val = model(Variable(obs, volatile=True))
+            """
             C_val = bonus_model(Variable(obs, volatile=True))
             b = C_val
             if config.gaussian_ts:
                 b = config.alpha * torch.distributions.normal.Normal(0, C_val)
-            return (Q_val + b).data.max(1)[1].view(1, 1)
+            """
+            return (Q_val).data.max(1)[1].view(1, 1)
         if config.egreedy_exploration:
             sample = random.random()
             eps_threshold = exploration.value(t)
@@ -171,12 +180,24 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
                 prev = curr
                 logging.info("Timestep %d" % (t,))
                 logging.info("Time elapsed %f" % diff)
+                img_dim = 4
+                import cv2
+                frame = cv2.resize(obs, (44, 44))
+                frame = np.reshape(frame, [1, 44, 44]) / 255.
+                frame = np.expand_dims(frame, 0)
+                frame = np.clip((frame * 8.).astype('int64'), 0., 7.)
+                frame = torch.from_numpy(frame)
+                frame = frame.type(torch.FloatTensor)
+                frame = frame.cuda()
+                # utils.save_image(pixel_bonus.sample_images(img_dim**2), 'images/iteration_{}.png'.format(t), nrow=img_dim, padding=0)
+                # pixel_bonus.sample_images(3, t)                
+                utils.save_image(frame / 8.,'images/obs_{}.png'.format(t),padding=0)
             bonus = intrinsic_reward
             # TODO: add bonus/intrinsic_reward to replay buffer
             pixel_bonus.writer.add_scalar('data/bonus', bonus, t)
             # add intrinsic reward to clipped reward
             # NOTE: don't add bonus since we separate Q and C
-            # reward += intrinsic_reward
+            reward += intrinsic_reward
             # clip reward to be in [-1, +1] once again
             reward = max(-1.0, min(reward, 1.0))
             assert -1.0 <= reward <= 1.0
@@ -282,7 +303,7 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
                 target_Q = deepcopy(Q)
 
             ######### REPEAT ABOVE FOR C NETWORK ##################
-            
+            """
             current_C_values = C(obs_batch).gather(1, act_batch.unsqueeze(1)).squeeze()
             # this gives you a FloatTensor of size 32 // gives values of max
             next_max_c = target_C(next_obs_batch).detach().max(1)[0]
@@ -293,10 +314,10 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
             # this is [r(x,a) + gamma * max_a' Q(x', a')]
             target_C_values = bonus_batch + (config.gamma * next_C_values)
 
-            if config.mmc:
+            #if config.mmc:
                 # replace target_Q_values with mixed target
-                target_C_values = ((1-config.beta) * target_C_values) + (config.beta *
-                                                                         mc_batch)
+            #    target_C_values = ((1-config.beta) * target_C_values) + (config.beta *
+            #                                                             mc_batch)
             # use huber loss
             C_loss = F.smooth_l1_loss(current_C_values, target_C_values)
 
@@ -317,7 +338,7 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
             # periodically update the target network
             if num_param_updates % config.target_update_freq == 0:
                 target_C = deepcopy(C)            
-
+            """
             ### 4. Log progress
             episode_rewards = get_wrapper_by_name(env, "Monitor").get_episode_rewards()
             if len(episode_rewards) > 0:
@@ -328,7 +349,7 @@ def dqn_learn(env, q_func, optimizer_spec, density, cnn_kwargs, config,
             # Tensorboard logging
             pixel_bonus.writer.add_scalar('data/bonus', intrinsic_reward, t)
             pixel_bonus.writer.add_scalar('data/Q_loss', loss, t)
-            pixel_bonus.writer.add_scalar('data/C_loss', C_loss, t)
+            #pixel_bonus.writer.add_scalar('data/C_loss', C_loss, t)
             pixel_bonus.writer.add_scalar('data/episode_reward', episode_rewards[-1], t)
 
             # save statistics

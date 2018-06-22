@@ -13,11 +13,12 @@ class Config():
     # environment
     #env_name = "MontezumaRevengeNoFrameskip-v4"
     env_name = "PongNoFrameskip-v4"
+    #env_name = "PrivateEyeNoFrameskip-v4"
     deep = True
     clip_grad = True
 
     # model and train config
-    log_freq = 1000
+    log_freq = 10000
     # save_freq = 5000
 
     # hyperparams
@@ -40,7 +41,7 @@ class Config():
 
     # epsilon-greedy
     egreedy_exploration = True
-    mmc = False
+    mmc = True
 
     # bonus 
     bonus = True

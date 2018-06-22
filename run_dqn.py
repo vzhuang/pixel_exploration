@@ -15,7 +15,8 @@ from utils.gym_atari_wrappers import get_env, get_wrapper_by_name
 from utils.schedule import LinearSchedule
 from configs.dqn_config import Config
 from learn import OptimizerSpec, dqn_learn
-from utils.pixelcnnpp_bonus import PixelBonus
+from utils.gatedpixelcnn_bonus import PixelBonus
+#from utils.pixelcnnpp_bonus import PixelBonus
 #from utils.tf_pixelcnnpp_wrapper import PixelBonus
 
 # do logging
@@ -74,8 +75,7 @@ def main(config, env):
     :param env:
     :return:
     """
-    FLAGS = update_tf_wrapper_args(args, utils.pixelcnnpp_bonus.FLAGS)
-    #FLAGS = update_tf_wrapper_args(args, utils.tf_pixelcnnpp_wrapper.FLAGS)
+    FLAGS = update_tf_wrapper_args(args, utils.gatedpixelcnn_bonus.FLAGS)
 
     def stopping_criterion(env, t):
         # t := number of steps of wrapped env
