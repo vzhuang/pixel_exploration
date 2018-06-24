@@ -72,12 +72,12 @@ class PixelBonus(object):
 
     def bonus(self, obs, action, t, num_actions):
         step = t
-        frame = resize(obs, (42, 42), order=1)
+        frame = resize(obs, (self.flags.img_height, self.flags.img_width), order=1)
         last_frame = process_density_images(frame)
         density_input = process_density_input(last_frame)
 
-        prob, loss = self.density_model.prob_evaluate(self.sess, density_input, True)
-        prob_dot, loss = self.density_model.prob_evaluate(self.sess, density_input)
+        prob = self.density_model.prob_evaluate(self.sess, density_input, True)
+        prob_dot = self.density_model.prob_evaluate(self.sess, density_input)
         prob += 1e-8
         prob_dot += 1e-8
         pred_gain = np.sum(np.log(prob_dot) - np.log(prob))

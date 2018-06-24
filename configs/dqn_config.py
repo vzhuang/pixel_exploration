@@ -5,15 +5,15 @@ Config file for DQN on Atari 2600 suite
 
 class Config():
     # output config
-    output_path = "results/dqn_pong/"
+    output_path = "results/dqn_privateeye/"
     # output_path = "/Users/kristyc/Downloads/"
     model_output = output_path + "model.weights/"
-    log_path = output_path + "test_pong.txt"
+    log_path = output_path + "test_privateeye.txt"
 
     # environment
     #env_name = "MontezumaRevengeNoFrameskip-v4"
-    env_name = "PongNoFrameskip-v4"
-    #env_name = "PrivateEyeNoFrameskip-v4"
+    #env_name = "PongNoFrameskip-v4"
+    env_name = "PrivateEyeNoFrameskip-v4"
     deep = True
     clip_grad = True
 
